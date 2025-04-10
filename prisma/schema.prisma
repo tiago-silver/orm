@@ -1,0 +1,41 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// Criação do  modelo das tabelas do banco de dados
+model User {
+  id String @id @default(uuid())
+  name String 
+  email String @unique
+
+  // Conecta o relacionamento com as questões (um usúario faz muitas questoes)
+  // Coloca em arrays se um para muitos
+  questions Question[]
+  
+
+// Como deve ser a representação da tabela no banco de dados, nesse caso, o nome da tabela
+  @@map("users")
+}
+
+// Modelo da tabela questions
+model Question {
+  id String @id @default(uuid())
+  title String
+  content String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  // O método @updatedAt pega as modificações automaticamente
+  updateAt DateTime @updatedAt @map("updated_at")
+
+  userId String @map("user_id")
+
+  // Criar o relacionamento de questões com usuários
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("questions")
+}
